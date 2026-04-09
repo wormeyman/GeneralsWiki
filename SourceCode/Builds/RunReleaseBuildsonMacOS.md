@@ -1,6 +1,8 @@
 # Running Generals Zero Hour on macOS (Apple Silicon)
 
-Tested on an M4 Pro MacBook Pro (24 GB RAM) running macOS Tahoe 26.4. The game runs through Wine-CrossOver via Heroic Launcher, no native macOS build exists yet. Performance and audio were both fine.
+Tested on an M4 Pro MacBook Pro (24 GB RAM) running macOS Tahoe 26.4.
+The game runs through Wine-CrossOver via Heroic Launcher, no native macOS build exists yet.
+Performance and audio were both fine.
 
 ## What you need
 
@@ -12,7 +14,7 @@ Tested on an M4 Pro MacBook Pro (24 GB RAM) running macOS Tahoe 26.4. The game r
 
 ## Step 1: Install SteamCMD
 
-```
+```bash
 brew install steamcmd
 ```
 
@@ -20,42 +22,50 @@ brew install steamcmd
 
 Run this command. Replace `YOUR_USERNAME` with your Steam username.
 
-```
+```bash
 steamcmd +@sSteamCmdForcePlatformType windows +login YOUR_USERNAME +app_update 2732960 validate +quit
 ```
 
-The `+@sSteamCmdForcePlatformType windows` flag forces Steam to download the Windows version of the game, since there's no macOS build.
+The `+@sSteamCmdForcePlatformType windows` flag forces Steam to download the Windows version of the game.
 
 Steam Guard will ask you to confirm on your phone. The download is about 3 GB.
 
 Files end up in:
 
-```
+```bash
 ~/Library/Application Support/Steam/steamapps/common/Command & Conquer Generals - Zero Hour/
 ```
 
 ## Step 3: Install the community patch
 
-Go to the [GeneralsGameCode releases page](https://github.com/TheSuperHackers/GeneralsGameCode/releases) and download the latest `weekly-*-generalszh` build.
+- Go to the [GeneralsGameCode releases page](https://github.com/TheSuperHackers/GeneralsGameCode/releases)
+- Download the latest `weekly-*-generalszh` build.
 
 Extract the files directly into the game folder from Step 2, overwriting the original executables.
 
 ## Step 4: Install Wine-CrossOver in Heroic
 
-Open Heroic Games Launcher. Go to **Wine Manager** (in the sidebar or settings) and install **Wine-CrossOver-Latest**. Version 23.7.1-1 was used here.
+Open Heroic Games Launcher. Go to **Wine Manager** (in the sidebar or settings) and install **Wine-CrossOver-Latest**.
+Version 23.7.1-1 was used when this was written.
 
 ### Why not Game Porting Toolkit?
 
-GPTK was tested but crashes on the splash screen. The crash is a memory allocation assertion inside Wine's virtual memory layer when running 32-bit executables through the `x86_32on64` translation path. Generals is a 32-bit DX8 game, and GPTK's 32-bit-on-64-bit emulation can't handle it.
+GPTK was tested but crashes on the splash screen.
+The crash is a memory allocation assertion inside Wine's virtual memory layer when running 32-bit executables
+through the `x86_32on64` translation path.
+Generals is a 32-bit DX8 game, and GPTK's 32-bit-on-64-bit emulation can't handle it.
 
 The relevant error from the Heroic log:
 
-```
+```bash
 Assertion failed: (end <= pages_vprot_size << pages_vprot_shift), function alloc_pages_vprot, file virtual.c, line 1032.
 0024:err:seh:NtRaiseException Exception frame is not in stack limits => unable to dispatch exception.
 ```
 
-This is a bug in GPTK, not something configurable on your end. Wine-CrossOver handles 32-bit apps through a more mature emulation path and doesn't hit this issue. If a future GPTK version fixes 32-bit virtual memory allocation on ARM64, it may be worth retrying since Apple's DirectX-to-Metal translation is theoretically a better long-term path.
+This is a bug in GPTK, not something configurable on your end.
+Wine-CrossOver handles 32-bit apps through a more mature emulation path and doesn't hit this issue.
+If a future GPTK version fixes 32-bit virtual memory allocation on ARM64,
+it may be worth retrying since Apple's DirectX-to-Metal translation is theoretically a better long-term path.
 
 ## Step 5: Add the game to Heroic
 
@@ -79,9 +89,12 @@ Set your resolution in the game's graphics options. 1900x1200 worked on a 14" Ma
 
 ### Mouse gets stuck on first launch
 
-The mouse cursor can get trapped or stop responding after the game launches. Pressing **Cmd+Tab** to switch away from the game and then back a few times fixed it. It's not clear whether this happens every launch or just the first time.
+The mouse cursor can get trapped or stop responding after the game launches.
+Pressing **Cmd+Tab** to switch away from the game and then back a few times fixed it.
+It's not clear whether this happens every launch or just the first time.
 
-If Cmd+Tab doesn't fix it, try enabling **Virtual Desktop** in Heroic's Wine configuration settings. That gives Wine its own contained window and usually resolves mouse capture problems with old DirectX games.
+If Cmd+Tab doesn't fix it, try enabling **Virtual Desktop** in Heroic's Wine configuration settings.
+That gives Wine its own contained window and usually resolves mouse capture problems with old DirectX games.
 
 ## What was NOT tested
 
@@ -92,4 +105,5 @@ If Cmd+Tab doesn't fix it, try enabling **Virtual Desktop** in Heroic's Wine con
 
 ## Troubleshooting
 
-If the game won't start, right-click the game icon in Heroic and select **Logs**. Common things to look for: D3D errors, missing DLL calls, or Wine prefix initialization failures.
+If the game won't start, right-click the game icon in Heroic and select **Logs**.
+Common things to look for: D3D errors, missing DLL calls, or Wine prefix initialization failures.
