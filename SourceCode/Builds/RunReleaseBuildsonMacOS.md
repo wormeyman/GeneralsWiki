@@ -1,3 +1,5 @@
+# Running Generals Zero Hour on macOS (Apple Silicon)
+
 Tested on an M4 Pro MacBook Pro (24 GB RAM) running macOS Tahoe 26.4. The game runs through Wine-CrossOver via Heroic Launcher, no native macOS build exists yet. Performance and audio were both fine.
 
 ## What you need
@@ -42,8 +44,18 @@ Extract the files directly into the game folder from Step 2, overwriting the ori
 
 Open Heroic Games Launcher. Go to **Wine Manager** (in the sidebar or settings) and install **Wine-CrossOver-Latest**. Version 23.7.1-1 was used here.
 
-> ⚠️ **A note on GPTK**: Game Porting Toolkit was also tested but crashed on the splash screen. Wine-CrossOver worked without issues. If a future GPTK version fixes this, it may be worth retrying since Apple's DirectX-to-Metal translation is theoretically a better long-term path.
-> 
+### Why not Game Porting Toolkit?
+
+GPTK was tested but crashes on the splash screen. The crash is a memory allocation assertion inside Wine's virtual memory layer when running 32-bit executables through the `x86_32on64` translation path. Generals is a 32-bit DX8 game, and GPTK's 32-bit-on-64-bit emulation can't handle it.
+
+The relevant error from the Heroic log:
+
+```
+Assertion failed: (end <= pages_vprot_size << pages_vprot_shift), function alloc_pages_vprot, file virtual.c, line 1032.
+0024:err:seh:NtRaiseException Exception frame is not in stack limits => unable to dispatch exception.
+```
+
+This is a bug in GPTK, not something configurable on your end. Wine-CrossOver handles 32-bit apps through a more mature emulation path and doesn't hit this issue. If a future GPTK version fixes 32-bit virtual memory allocation on ARM64, it may be worth retrying since Apple's DirectX-to-Metal translation is theoretically a better long-term path.
 
 ## Step 5: Add the game to Heroic
 
@@ -76,15 +88,8 @@ If Cmd+Tab doesn't fix it, try enabling **Virtual Desktop** in Heroic's Wine con
 - Online multiplayer
 - The base *Generals* game (only *Zero Hour* was tested)
 - Intel Macs
-- Game Porting Toolkit (crashed — see note above)
 - Mods
 
 ## Troubleshooting
 
-Heroic logs are at:
-
-```
-~/Library/Application Support/heroic/GamesConfig/last.log
-```
-
-Check there if the game won't start. Common things to look for: D3D errors, missing DLL calls, or Wine prefix initialization failures.
+If the game won't start, right-click the game icon in Heroic and select **Logs**. Common things to look for: D3D errors, missing DLL calls, or Wine prefix initialization failures.
